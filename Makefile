@@ -97,7 +97,7 @@ svc_stone: logmsg.rc $(SVC_LIBS)
 	$(MAKE) FLAGS="-DNT_SERVICE $(FLAGS)" LIBS="$(LIBS) $(SVC_LIBS) -ladvapi32 -luser32 -lshell32 -lkernel32" $(TARGET)
 
 linux:
-	$(MAKE) FLAGS="-O -Wall -DCPP='\"/usr/bin/cpp -traditional\"' -DPTHREAD -DUNIX_DAEMON -DPRCTL -DSO_ORIGINAL_DST=80 -DUSE_EPOLL $(FLAGS)" LIBS="-lpthread $(LIBS)" stone
+	$(MAKE) FLAGS="-O -Wall -DCPP='\"/usr/bin/cpp -traditional\"' -DPTHREAD -DUNIX_DAEMON -DPRCTL -DSO_ORIGINAL_DST=80 -DUSE_EPOLL -D_GNU_SOURCE $(FLAGS)" LIBS="-lpthread $(LIBS)" stone
 
 linux-pop:
 	$(MAKE) TARGET=linux pop_stone
