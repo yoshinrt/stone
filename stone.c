@@ -3265,7 +3265,7 @@ int doSSL_accept(Pair *pair) {
     if (Debug > 7)
 	message(LOG_DEBUG, "%d TCP %d: SSL_accept ret=%d, state=%x, "
 		"finished=%x, in_init=%x/%x", pair->stone->sd,
-		sd, ret, SSL_state(ssl), SSL_is_init_finished(ssl),
+		sd, ret, SSL_get_state(ssl), SSL_is_init_finished(ssl),
 		SSL_in_init(ssl), SSL_in_accept_init(ssl));
     if (ret > 0) {	/* success */
 	if (SSL_in_accept_init(ssl)) {

@@ -125,6 +125,31 @@ fon-pop:
 fon-ssl:
 	$(MAKE) CC="mips-linux-uclibc-gcc" SSL_LIBS="-lssl -lcrypto" TARGET=fon ssl_stone
 
+TOOLDIR_AG300H	= $(OPENWRT_DIR)/staging_dir/target-mips_24kc_musl
+openssl/libssl.so: Makefile
+	cd openssl; ./Configure linux-mips32 --prefix=/usr --libdir=lib \
+		--openssldir=/etc/ssl --cross-compile-prefix="mips-openwrt-linux-musl-" \
+		-I$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/include \
+		-I$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include/fortify \
+		-I$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include \
+		-L$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/lib \
+		-L$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/lib \
+		-znow -zrelro -Wl,--gc-sections shared enable-weak-ssl-ciphers \
+		enable-ssl enable-ssl2 enable-ssl2-method enable-ssl3 enable-ssl3-method \
+		-DOPENSSL_PREFER_CHACHA_OVER_GCM -DOPENSSL_SMALL_FOOTPRINT; \
+	$(MAKE)
+
+ag300h:
+	$(MAKE) CC="mips-openwrt-linux-musl-gcc" CFLAGS="$(CFLAGS) -D_GNU_SOURCE -I$(TOOLDIR_AG300H)/usr/include -L$(TOOLDIR_AG300H)/usr/lib" \
+		FLAGS="-O -Wall -DPTHREAD -DUNIX_DAEMON -DPRCTL $(FLAGS)" LIBS="-lpthread $(LIBS)" stone
+	mips-openwrt-linux-musl-strip stone
+
+ag300h-pop:
+	$(MAKE) CC="mips-openwrt-linux-musl-gcc" TARGET=ag300h pop_stone
+
+ag300h-ssl: openssl/libssl.so
+	$(MAKE) CC="mips-openwrt-linux-musl-gcc" CFLAGS="-static -I./openssl/include -L./openssl" SSL_LIBS="-lssl -lcrypto" TARGET=ag300h ssl_stone
+
 bsd:
 	$(MAKE) FLAGS="-DCPP='\"/usr/bin/cpp -traditional\"' -D_THREAD_SAFE -DPTHREAD -DREG_NOERROR=0 $(FLAGS)" LIBS="-pthread $(LIBS)" stone
 

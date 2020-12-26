@@ -12,9 +12,9 @@ SHLIB_VERSION_HISTORY=
 SHLIB_MAJOR=1
 SHLIB_MINOR=0.0
 SHLIB_EXT=.so.$(SHLIB_MAJOR).$(SHLIB_MINOR)
-PLATFORM=linux-x86_64
-OPTIONS=-Wa,--noexecstack no-ec_nistp_64_gcc_128 no-gmp no-jpake no-krb5 no-libunbound no-md2 no-rc5 no-rfc3779 no-sctp no-shared no-ssl-trace no-ssl2 no-store no-unit-test no-weak-ssl-ciphers no-zlib no-zlib-dynamic static-engine
-CONFIGURE_ARGS=linux-x86_64 -Wa,--noexecstack
+PLATFORM=linux-mips32
+OPTIONS=--prefix=/usr --libdir=lib --openssldir=/etc/ssl --cross-compile-prefix=mips-openwrt-linux-musl- -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/include -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include/fortify -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include -L/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/lib -L/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/lib -znow -zrelro -Wl,--gc-sections enable-shared enable-weak-ssl-ciphers enable-ssl enable-ssl2 enable-ssl2-method enable-ssl3 enable-ssl3-method -DOPENSSL_PREFER_CHACHA_OVER_GCM -DOPENSSL_SMALL_FOOTPRINT no-ec_nistp_64_gcc_128 no-gmp no-jpake no-krb5 no-libunbound no-md2 no-rc5 no-rfc3779 no-sctp no-ssl-trace no-store no-unit-test no-zlib no-zlib-dynamic no-static-engine
+CONFIGURE_ARGS=linux-mips32 --prefix=/usr --libdir=lib --openssldir=/etc/ssl --cross-compile-prefix=mips-openwrt-linux-musl- -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/include -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include/fortify -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include -L/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/lib -L/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/lib -znow -zrelro -Wl,--gc-sections shared enable-weak-ssl-ciphers enable-ssl enable-ssl2 enable-ssl2-method enable-ssl3 enable-ssl3-method -DOPENSSL_PREFER_CHACHA_OVER_GCM -DOPENSSL_SMALL_FOOTPRINT
 SHLIB_TARGET=linux-shared
 
 # HERE indicates where this Makefile lives.  This can be used to indicate
@@ -26,10 +26,10 @@ HERE=.
 # for, say, /usr/ and yet have everything installed to /tmp/somedir/usr/.
 # Normally it is left empty.
 INSTALL_PREFIX=
-INSTALLTOP=/usr/local/ssl
+INSTALLTOP=/usr
 
 # Do not edit this manually. Use Configure --openssldir=DIR do change this!
-OPENSSLDIR=/usr/local/ssl
+OPENSSLDIR=/etc/ssl
 
 # NO_IDEA - Define to build without the IDEA algorithm
 # NO_RC4  - Define to build without the RC4 algorithm
@@ -59,21 +59,22 @@ OPENSSLDIR=/usr/local/ssl
 # equal 4.
 # PKCS1_CHECK - pkcs1 tests.
 
-CC= gcc
-CFLAG= -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -m64 -DL_ENDIAN -O3 -Wall -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DRC4_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM
-DEPFLAG= -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_GMP -DOPENSSL_NO_JPAKE -DOPENSSL_NO_LIBUNBOUND -DOPENSSL_NO_MD2 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_SCTP -DOPENSSL_NO_SSL_TRACE -DOPENSSL_NO_SSL2 -DOPENSSL_NO_STORE -DOPENSSL_NO_UNIT_TEST -DOPENSSL_NO_WEAK_SSL_CIPHERS
+CROSS_COMPILE= mips-openwrt-linux-musl-
+CC= $(CROSS_COMPILE)gcc
+CFLAG= -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/include -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include/fortify -I/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include -znow -zrelro -DOPENSSL_PREFER_CHACHA_OVER_GCM -DOPENSSL_SMALL_FOOTPRINT -mabi=32 -O3 -Wall -DBN_DIV3W -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DAES_ASM
+DEPFLAG= -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_GMP -DOPENSSL_NO_JPAKE -DOPENSSL_NO_LIBUNBOUND -DOPENSSL_NO_MD2 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_SCTP -DOPENSSL_NO_SSL_TRACE -DOPENSSL_NO_STORE -DOPENSSL_NO_UNIT_TEST
 PEX_LIBS= 
-EX_LIBS= -ldl
+EX_LIBS= -L/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/lib -L/home/yoshi/openwrt/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/lib -Wl,--gc-sections -ldl
 EXE_EXT= 
 ARFLAGS= 
-AR= ar $(ARFLAGS) r
-RANLIB= /usr/bin/ranlib
-RC= windres
-NM= nm
+AR= $(CROSS_COMPILE)ar $(ARFLAGS) r
+RANLIB= $(CROSS_COMPILE)ranlib
+RC= $(CROSS_COMPILE)windres
+NM= $(CROSS_COMPILE)nm
 PERL= /usr/bin/perl
 TAR= tar
 TARFLAGS= --no-recursion
-MAKEDEPPROG= gcc
+MAKEDEPPROG= $(CROSS_COMPILE)gcc
 LIBDIR=lib
 
 # We let the C compiler driver to take care of .s files. This is done in
@@ -89,23 +90,23 @@ ASFLAG=$(CFLAG)
 PROCESSOR= 
 
 # CPUID module collects small commonly used assembler snippets
-CPUID_OBJ= x86_64cpuid.o
-BN_ASM= x86_64-gcc.o x86_64-mont.o x86_64-mont5.o x86_64-gf2m.o rsaz_exp.o rsaz-x86_64.o rsaz-avx2.o
-EC_ASM= ecp_nistz256.o ecp_nistz256-x86_64.o
+CPUID_OBJ= mem_clr.o
+BN_ASM= bn-mips.o mips-mont.o
+EC_ASM= 
 DES_ENC= des_enc.o fcrypt_b.o
-AES_ENC= aes-x86_64.o vpaes-x86_64.o bsaes-x86_64.o aesni-x86_64.o aesni-sha1-x86_64.o aesni-sha256-x86_64.o aesni-mb-x86_64.o
+AES_ENC= aes_cbc.o aes-mips.o
 BF_ENC= bf_enc.o
 CAST_ENC= c_enc.o
-RC4_ENC= rc4-x86_64.o rc4-md5-x86_64.o
+RC4_ENC= rc4_enc.o rc4_skey.o
 RC5_ENC= rc5_enc.o
-MD5_ASM_OBJ= md5-x86_64.o
-SHA1_ASM_OBJ= sha1-x86_64.o sha256-x86_64.o sha512-x86_64.o sha1-mb-x86_64.o sha256-mb-x86_64.o
+MD5_ASM_OBJ= 
+SHA1_ASM_OBJ= sha1-mips.o sha256-mips.o
 RMD160_ASM_OBJ= 
-WP_ASM_OBJ= wp-x86_64.o
-CMLL_ENC= cmll-x86_64.o cmll_misc.o
-MODES_ASM_OBJ= ghash-x86_64.o aesni-gcm-x86_64.o
+WP_ASM_OBJ= wp_block.o
+CMLL_ENC= camellia.o cmll_misc.o cmll_cbc.o
+MODES_ASM_OBJ= 
 ENGINES_ASM_OBJ= 
-PERLASM_SCHEME= elf
+PERLASM_SCHEME= o32
 
 # KRB5 stuff
 KRB5_INCLUDES=
@@ -176,9 +177,9 @@ WDIRS=  windows
 LIBS=   libcrypto.a libssl.a
 SHARED_CRYPTO=libcrypto$(SHLIB_EXT)
 SHARED_SSL=libssl$(SHLIB_EXT)
-SHARED_LIBS=
+SHARED_LIBS=$(SHARED_CRYPTO) $(SHARED_SSL)
 SHARED_LIBS_LINK_EXTS=.so.$(SHLIB_MAJOR) .so
-SHARED_LDFLAGS=-m64
+SHARED_LDFLAGS=
 
 GENERAL=        Makefile
 BASENAME=       openssl
