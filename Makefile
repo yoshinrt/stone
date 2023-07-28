@@ -55,6 +55,7 @@ all:
 
 clean:
 	rm -f stone $(POP_LIBS) stone.exe stone.obj md5c.obj stone.o $(SVC_LIBS) MSG00001.bin logmsg.h logmsg.rc cryptoapi.o
+	if [ -d openssl ]; then cd openssl; make distclean; fi
 
 md5c.c:
 	@echo "*** md5c.c is contained in RFC1321"
@@ -125,30 +126,34 @@ fon-pop:
 fon-ssl:
 	$(MAKE) CC="mips-linux-uclibc-gcc" SSL_LIBS="-lssl -lcrypto" TARGET=fon ssl_stone
 
-TOOLDIR_AG300H	= $(OPENWRT_DIR)/staging_dir/target-mips_24kc_musl
+##############################################################################
+# OpenWRT
+
 openssl/libssl.so: Makefile
-	cd openssl; ./Configure linux-mips32 --prefix=/usr --libdir=lib \
-		--openssldir=/etc/ssl --cross-compile-prefix="mips-openwrt-linux-musl-" \
-		-I$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/include \
-		-I$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include/fortify \
-		-I$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/include \
-		-L$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/usr/lib \
-		-L$(OPENWRT_DIR)/staging_dir/toolchain-mips_24kc_gcc-8.4.0_musl/lib \
+	cd openssl; ./Configure $(OPENWRT_CPU_ARCH) --prefix=/usr --libdir=lib \
+		--openssldir=/etc/ssl --cross-compile-prefix="$(OPENWRT_TOOL_PREFIX)-" \
+		-I$(STAGING_DIR)/usr/include \
+		-I$(STAGING_DIR)/include/fortify \
+		-I$(STAGING_DIR)/include \
+		-L$(STAGING_DIR)/usr/lib \
+		-L$(STAGING_DIR)/lib \
 		-znow -zrelro -Wl,--gc-sections shared enable-weak-ssl-ciphers \
 		enable-ssl enable-ssl2 enable-ssl2-method enable-ssl3 enable-ssl3-method \
 		-DOPENSSL_PREFER_CHACHA_OVER_GCM -DOPENSSL_SMALL_FOOTPRINT; \
 	$(MAKE)
 
-ag300h:
-	$(MAKE) CC="mips-openwrt-linux-musl-gcc" CFLAGS="$(CFLAGS) -D_GNU_SOURCE -I$(TOOLDIR_AG300H)/usr/include -L$(TOOLDIR_AG300H)/usr/lib" \
+openwrt:
+	$(MAKE) CC="$(OPENWRT_TOOL_PREFIX)-gcc" CFLAGS="$(CFLAGS) -D_GNU_SOURCE -I$(OPENWRT_TOOL_DIR)/usr/include -L$(OPENWRT_TOOL_DIR)/usr/lib" \
 		FLAGS="-O -Wall -DPTHREAD -DUNIX_DAEMON -DPRCTL $(FLAGS)" LIBS="-lpthread $(LIBS)" stone
-	mips-openwrt-linux-musl-strip stone
+	$(OPENWRT_TOOL_PREFIX)-strip stone
 
-ag300h-pop:
-	$(MAKE) CC="mips-openwrt-linux-musl-gcc" TARGET=ag300h pop_stone
+openwrt-pop:
+	$(MAKE) CC="$(OPENWRT_TOOL_PREFIX)-gcc" TARGET=openwrt pop_stone
 
-ag300h-ssl: openssl/libssl.so
-	$(MAKE) CC="mips-openwrt-linux-musl-gcc" CFLAGS="-static -I./openssl/include -L./openssl" SSL_LIBS="-lssl -lcrypto" TARGET=ag300h ssl_stone
+openwrt-ssl: openssl/libssl.so
+	$(MAKE) CC="$(OPENWRT_TOOL_PREFIX)-gcc" CFLAGS="-static -I./openssl/include -L./openssl" SSL_LIBS="-lssl -lcrypto" TARGET=openwrt ssl_stone
+
+##############################################################################
 
 bsd:
 	$(MAKE) FLAGS="-DCPP='\"/usr/bin/cpp -traditional\"' -D_THREAD_SAFE -DPTHREAD -DREG_NOERROR=0 $(FLAGS)" LIBS="-pthread $(LIBS)" stone
